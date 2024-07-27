@@ -51,13 +51,43 @@ async function getNote(req, res) {
 }
 
 async function getAllNotes(req, res) {
-  // try{
-  // }
+   try {
+        const notes = await Notes.find({ user: req.user.id });
+        res.json(notes);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching notes", error });
+    }
+
+async function updateNote(req, res) {
+  try {
+        const { id } = req.params;
+        const { text } = req.body;
+        const updatedNote = await Notes.findByIdAndUpdate(
+            id,
+            { text },
+            { new: true }
+        );
+        if (!updatedNote) {
+            return res.status(404).json({ message: "Note not found" });
+        }
+        res.json(updatedNote);
+    } catch (error) {
+        res.status(500).json({ message: "Error updating note", error });
+    }
 }
 
-async function updateNote(req, res) {}
-
-async function deleteNote(req, res) {}
+async function deleteNote(req, res) {
+  try {
+        const { id } = req.params;
+        const deletedNote = await Notes.findByIdAndDelete(id);
+        if (!deletedNote) {
+            return res.status(404).json({ message: "Note not found" });
+        }
+        res.json({ message: "Note deleted" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting note", error });
+    }
+}
 
 module.exports = {
   createNote,
